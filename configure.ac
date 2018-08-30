@@ -17,7 +17,7 @@ LT_INIT
 
 JANUS_VERSION=44
 AC_SUBST(JANUS_VERSION)
-JANUS_VERSION_STRING="0.4.4"
+JANUS_VERSION_STRING="0.4.4-August"
 AC_SUBST(JANUS_VERSION_STRING)
 
 case "$host_os" in
@@ -676,6 +676,7 @@ PKG_CHECK_MODULES([OPUS],
                   [
                     AS_IF([test "x$enable_plugin_audiobridge" = "xmaybe"],
                           [enable_plugin_audiobridge=yes])
+                    have_opus=yes
                   ],
                   [
                     AS_IF([test "x$enable_plugin_audiobridge" = "xyes"],
@@ -716,6 +717,20 @@ PKG_CHECK_MODULES([LUA],
                   ])
 AC_SUBST([LUA_CFLAGS])
 AC_SUBST([LUA_LIBS])
+
+PKG_CHECK_MODULES([LIBPULSE],
+                  [libpulse],
+                  [
+                    AS_IF(
+                      [test "x$enable_plugin_streaming" != "xno"],
+                      [
+                        AS_IF([test "x$have_opus" = "xyes"],
+                              [AC_DEFINE(HAVE_LIBPULSE)])
+                      ])
+                  ],
+                  [AC_MSG_NOTICE([pulse audio output not supported])])
+AC_SUBST([LIBPULSE_CFLAGS])
+AC_SUBST([LIBPULSE_LIBS])
 
 AM_CONDITIONAL([ENABLE_PLUGIN_AUDIOBRIDGE], [test "x$enable_plugin_audiobridge" = "xyes"])
 AM_CONDITIONAL([ENABLE_PLUGIN_DUKTAPE], [test "x$enable_plugin_duktape" = "xyes"])
