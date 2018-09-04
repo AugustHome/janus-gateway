@@ -644,18 +644,18 @@ notify_joining = true|false (optional, whether to notify all participants when a
 	"host" : "<host address to forward the RTP and data packets to>",
 	"audio_port" : <port to forward the audio RTP packets to>,
 	"audio_ssrc" : <audio SSRC to use to use when streaming; optional>,
-	"audio_ptype" : <audio payload type to use when streaming; optional>,
+	"audio_pt" : <audio payload type to use when streaming; optional>,
 	"audio_rtcp_port" : <port to contact to receive audio RTCP feedback from the recipient; optional, and currently unused for audio>,
 	"video_port" : <port to forward the video RTP packets to>,
 	"video_ssrc" : <video SSRC to use to use when streaming; optional>,
-	"video_ptype" : <video payload type to use when streaming; optional>,
+	"video_pt" : <video payload type to use when streaming; optional>,
 	"video_rtcp_port" : <port to contact to receive video RTCP feedback from the recipient; optional>,
 	"video_port_2" : <if simulcasting, port to forward the video RTP packets from the second substream/layer to>,
 	"video_ssrc_2" : <if simulcasting, video SSRC to use to use the second substream/layer; optional>,
-	"video_ptype_2" : <if simulcasting, video payload type to use the second substream/layer; optional>,
+	"video_pt_2" : <if simulcasting, video payload type to use the second substream/layer; optional>,
 	"video_port_3" : <if simulcasting, port to forward the video RTP packets from the third substream/layer to>,
 	"video_ssrc_3" : <if simulcasting, video SSRC to use to use the third substream/layer; optional>,
-	"video_ptype_3" : <if simulcasting, video payload type to use the third substream/layer; optional>,
+	"video_pt_3" : <if simulcasting, video payload type to use the third substream/layer; optional>,
 	"data_port" : <port to forward the datachannel messages to>,
 	"srtp_suite" : <length of authentication tag (32 or 80); optional>,
 	"srtp_crypto" : "<key to use as crypto (base64 encoded key as in SDES); optional>"
@@ -5709,10 +5709,10 @@ static void *janus_videoroom_handler(void *data) {
 				if(participant->acodec == JANUS_AUDIOCODEC_NONE) {
 					int i=0;
 					for(i=0; i<3; i++) {
-						if(participant->room->acodec[i] == JANUS_AUDIOCODEC_NONE)
+						if(videoroom->acodec[i] == JANUS_AUDIOCODEC_NONE)
 							continue;
-						if(janus_sdp_get_codec_pt(offer, janus_audiocodec_name(participant->room->acodec[i])) != -1) {
-							participant->acodec = participant->room->acodec[i];
+						if(janus_sdp_get_codec_pt(offer, janus_audiocodec_name(videoroom->acodec[i])) != -1) {
+							participant->acodec = videoroom->acodec[i];
 							break;
 						}
 					}
@@ -5722,10 +5722,10 @@ static void *janus_videoroom_handler(void *data) {
 				if(participant->vcodec == JANUS_VIDEOCODEC_NONE) {
 					int i=0;
 					for(i=0; i<3; i++) {
-						if(participant->room->vcodec[i] == JANUS_VIDEOCODEC_NONE)
+						if(videoroom->vcodec[i] == JANUS_VIDEOCODEC_NONE)
 							continue;
-						if(janus_sdp_get_codec_pt(offer, janus_videocodec_name(participant->room->vcodec[i])) != -1) {
-							participant->vcodec = participant->room->vcodec[i];
+						if(janus_sdp_get_codec_pt(offer, janus_videocodec_name(videoroom->vcodec[i])) != -1) {
+							participant->vcodec = videoroom->vcodec[i];
 							break;
 						}
 					}

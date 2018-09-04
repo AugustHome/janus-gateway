@@ -1974,7 +1974,7 @@ function Janus(gatewayCallbacks) {
 						// https://groups.google.com/forum/#!topic/discuss-webrtc/Uf0SrR4uxzk
 						// https://webrtchacks.com/chrome-screensharing-getdisplaymedia/
 						navigator.getDisplayMedia({ video: true })
-							.then(stream => {
+							.then(function(stream) {
 								pluginHandle.consentDialog(false);
 								if(isAudioSendEnabled(media)){
 									navigator.mediaDevices.getUserMedia({ audio: true, video: false })
@@ -1985,7 +1985,7 @@ function Janus(gatewayCallbacks) {
 								} else {
 									streamsDone(handleId, jsep, media, callbacks, stream);
 								}
-							}, error => {
+							}, function (error) {
 								pluginHandle.consentDialog(false);
 								callbacks.error(error);
 							});
@@ -2113,7 +2113,7 @@ function Janus(gatewayCallbacks) {
 					var audioExist = devices.some(function(device) {
 						return device.kind === 'audioinput';
 					}),
-					videoExist = devices.some(function(device) {
+					videoExist = isScreenSendEnabled(media) || devices.some(function(device) {
 						return device.kind === 'videoinput';
 					});
 
@@ -3105,6 +3105,22 @@ function Janus(gatewayCallbacks) {
 		if(media.videoRecv === undefined || media.videoRecv === null)
 			return true;	// Default
 		return (media.videoRecv === true);
+	}
+
+	function isScreenSendEnabled(media) {
+		Janus.debug("isScreenSendEnabled:", media);
+		if (media === undefined || media === null)
+			return false;
+		if (typeof media.video !== 'object' || typeof media.video.mandatory !== 'object')
+			return false;
+		var constraints = media.video.mandatory;
+		if (constraints.chromeMediaSource)
+			return constraints.chromeMediaSource === 'desktop' || constraints.chromeMediaSource === 'screen';
+		else if (constraints.mozMediaSource)
+			return constraints.mozMediaSource === 'window' || constraints.mozMediaSource === 'screen';
+		else if (constraints.mediaSource)
+			return constraints.mediaSource === 'window' || constraints.mediaSource === 'screen';
+		return false;
 	}
 
 	function isDataEnabled(media) {
