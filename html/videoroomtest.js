@@ -23,12 +23,12 @@
 // 		var server = "ws://" + window.location.hostname + ":8188";
 //
 // Of course this assumes that support for WebSockets has been built in
-// when compiling the gateway. WebSockets support has not been tested
+// when compiling the server. WebSockets support has not been tested
 // as much as the REST API, so handle with care!
 //
 //
 // If you have multiple options available, and want to let the library
-// autodetect the best way to contact your gateway (or pool of gateways),
+// autodetect the best way to contact your server (or pool of servers),
 // you can also pass an array of servers, e.g., to provide alternative
 // means of access (e.g., try WebSockets first and, if that fails, fall
 // back to plain HTTP) or just have failover servers:
@@ -469,6 +469,7 @@ function newRemoteFeed(id, display, audio, video) {
 					toastr.warning("Publisher is using " + video + ", but Safari doesn't support it: disabling video");
 					listen["offer_video"] = false;
 				}
+				remoteFeed.videoCodec = video;
 				remoteFeed.send({"message": listen});
 			},
 			error: function(error) {
@@ -510,7 +511,7 @@ function newRemoteFeed(id, display, audio, video) {
 							if(!remoteFeed.simulcastStarted) {
 								remoteFeed.simulcastStarted = true;
 								// Add some new buttons
-								addSimulcastButtons(remoteFeed.rfindex, temporal !== null && temporal !== undefined);
+								addSimulcastButtons(remoteFeed.rfindex, remoteFeed.videoCodec === "vp8");
 							}
 							// We just received notice that there's been a switch, update the buttons
 							updateSimulcastButtons(remoteFeed.rfindex, substream, temporal);
